@@ -25,16 +25,12 @@ class ChattingWindow extends JFrame{
     JButton buttonAttachment;
     JScrollPane scrollingContainerTextAreaIncomingMessages;
     JScrollPane scrollingContainerTextAreaOutgoingMessages;
-    UDPClientToGetIP udpClient;
     TCPClient tcpClient;
     String nameOfFileToSend="";
     
     public ChattingWindow(String stringUserName){
     	super();
-    	////////////////////////////////////////////////////////////////////////////////////////////////////////
-    	udpClient=new UDPClientToGetIP();
-    	
-		this.stringUserName=stringUserName;
+    	this.stringUserName=stringUserName;
 		setTitle("CodeSharer");
 		this.setIconImage(new ImageIcon(this.getClass().getResource("/mainIcon.png")).getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		//this.getContentPane().setBackground(Color.BLACK);
@@ -60,13 +56,14 @@ class ChattingWindow extends JFrame{
 		Image scaledToFitAttachmentImage=null;
 		try {
 			scaledToFitAttachmentImage = ImageIO.read(this.getClass().getResource("/attachmentIcon.png")).getScaledInstance(50, 50,Image.SCALE_SMOOTH);
+			buttonAttachment.setIcon(new ImageIcon(scaledToFitAttachmentImage));
+			buttonAttachment.setOpaque(false);
+			buttonAttachment.setContentAreaFilled(false);
+			buttonAttachment.setBorderPainted(false);
 		} catch (IOException e1) {
-		
+			//failed to load the image as button icon
+			buttonAttachment=new JButton("Attach");
 		}
-		buttonAttachment.setIcon(new ImageIcon(scaledToFitAttachmentImage));
-		buttonAttachment.setOpaque(false);
-		buttonAttachment.setContentAreaFilled(false);
-		buttonAttachment.setBorderPainted(false);
 		
 		scrollingContainerTextAreaIncomingMessages=new JScrollPane(textAreaIncomingMessages);
 		scrollingContainerTextAreaOutgoingMessages=new JScrollPane(textAreaOutgoingMessages);
@@ -82,53 +79,55 @@ class ChattingWindow extends JFrame{
 		
 		textAreaIncomingMessages.setEditable(false);
 		setSize(506,670);
-		//Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-	    //int x = (int) ((dimension.getWidth() - 506) / 2);
-	    //int y = 20;
-	    //setLocation(x, y);
 		setLocationRelativeTo(null);
-		setVisible(true);
+	
 		setResizable(false);
 		addWindowListener(new ExitApplication());
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		tcpClient=new TCPClient(this, udpClient.serverIP,stringUserName);
-		
-		buttonSend.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				if(tcpClient.isSendingFile||tcpClient.isRecievingFile){
-					JOptionPane.showMessageDialog(getRootPane(),"You can not send messagges while you upload or Download files !!!","ERROR",JOptionPane.ERROR_MESSAGE);
-				}else{
-					String stringMessage=ChattingWindow.this.stringUserName+" says:"
-							+"\n"+textAreaOutgoingMessages.getText();
-					textAreaOutgoingMessages.setText("");
-					tcpClient.sendMessage(stringMessage);
-				}
-			}
-		});
-		
-		
-		buttonAttachment.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e){
-				JFileChooser fileChooser=new JFileChooser();
-				fileChooser.showDialog(rootPane,"Send");
-				File fileToSend=fileChooser.getSelectedFile();
-				if(((int)fileToSend.length())>5242880){
-					JOptionPane.showMessageDialog(getRootPane(),"Attachment of more than 5 mb is not allowed !!!","ERROR",JOptionPane.ERROR_MESSAGE);
-				}else{
-					try{
-						nameOfFileToSend=fileToSend.getAbsolutePath();
-						tcpClient.sendMessage("INITIATE_FILE_TRANSFER_FROM_CLIENT_TO_SERVER@"+(int)fileToSend.length()+"#"+fileToSend.getName());
-					}catch(Exception exception){
+		startClient();
+		setVisible(true);
+	}
+    
+    private void startClient(){
+    	
+    	UDPClientToGetIP udpClient=new UDPClientToGetIP(ChattingWindow.this);
+    	tcpClient=new TCPClient(this, udpClient.getIPAddressOfServer(), stringUserName);
+    	tcpClient.startTCPClient();
+    	
+    	buttonSend.addActionListener(new ActionListener(){
+    		@Override
+    		public void actionPerformed(ActionEvent e){
+    			if(tcpClient.isSendingFile||tcpClient.isRecievingFile){
+    				JOptionPane.showMessageDialog(getRootPane(),"You can not send messagges while you upload or Download files !!!","ERROR",JOptionPane.ERROR_MESSAGE);
+    			}else{
+    				String stringMessage=ChattingWindow.this.stringUserName+" says:"
+    						+"\n"+textAreaOutgoingMessages.getText();
+    				textAreaOutgoingMessages.setText("");
+    				tcpClient.sendMessage(stringMessage);
+    			}
+    		}
+    	});
 
-					}
-				}
-			}
-		});
+
+    	buttonAttachment.addActionListener(new ActionListener(){
+    		@Override
+    		public void actionPerformed(ActionEvent e){
+    			JFileChooser fileChooser=new JFileChooser();
+    			fileChooser.showDialog(rootPane,"Send");
+    			File fileToSend=fileChooser.getSelectedFile();
+    			if(((int)fileToSend.length())>5242880){
+    				
+    				JOptionPane.showMessageDialog(getRootPane(),"Attachment of more than 5 mb is not allowed !!!","ERROR",JOptionPane.ERROR_MESSAGE);
+    			
+    			}else{
+
+    				nameOfFileToSend=fileToSend.getAbsolutePath();
+    				//sending command to server to start file transfer
+    				tcpClient.sendMessage("INITIATE_FILE_TRANSFER_FROM_CLIENT_TO_SERVER@"+(int)fileToSend.length()+"#"+fileToSend.getName());
+    				
+    			}
+    		}
+    	});
+
     }
-    public static void main(String args[]){
-    	new ChattingWindow("saurabh");
-    }
-   
+    
 }

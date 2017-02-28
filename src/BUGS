@@ -1,29 +1,4 @@
-closing the client causing the server to get in an infinite loop
-which sends the last message of exiting client infinetly
-problem in tcpserver line 40
-///////solved
+files will be corrupted if someone sends a message to client when he is downloading file from server.
+can use separate ports foe messages and files
 
-
-make sure that multiple windows can not be run 
-either of server or client
-
-
-autoscroll textbox
-//////solved
-
-
-handle all execptions
-
-
-get name to the server
-//////solved
-
-
-close all outputstreams and port and sockets
-
-
-correct output
-////////solved
-
-
-close all filestreams
+change download location

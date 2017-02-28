@@ -59,12 +59,12 @@ class LoginWindow extends JFrame{
 				    String stringPassword = passwordFieldPassword.getText();
 				    if(stringPassword.equals("")){
 					    setVisible(false);
-					    SwingUtilities.invokeLater(new Runnable(){
+					    new Thread(new Runnable(){
 					    	@Override
 					        public void run(){
 					    		new ChattingWindow(stringUsername);
 					    	}	        
-					    });
+					    }).start();
 					    LoginWindow.this.dispose();
 				    }else{
 				    	JOptionPane.showMessageDialog(getRootPane(),"Incorrect password !!!","ERROR",JOptionPane.ERROR_MESSAGE);

@@ -7,18 +7,25 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
+import javax.swing.JOptionPane;
+
 public class UDPClientToGetIP {
 	
 	DatagramSocket clientSocket=null;
 	String serverIP;
+	ChattingWindow referenceToChattingWindow;
 	
-	public UDPClientToGetIP(){
-		createClient();
+	public UDPClientToGetIP(ChattingWindow referenceToChattingWindow){
+		this.referenceToChattingWindow=referenceToChattingWindow;
+		startUDPClient();
 	}
 
-	private void createClient() {
+	private void startUDPClient() {
 		try{
 			clientSocket=new DatagramSocket();
+			//broadcast message
+			//server with poet no. 1111 will recieve the packets
+		
 			DatagramPacket packetToSend=new DatagramPacket("IAMTHECLIENT".getBytes()
 					, "IAMTHECLIENT".getBytes().length
 					,InetAddress.getByName("255.255.255.255"),1111);
@@ -30,7 +37,6 @@ public class UDPClientToGetIP {
 		        NetworkInterface iface = interfaces.nextElement();
 		        //if (iface.isLoopback() || !iface.isUp() || iface.isVirtual() || iface.isPointToPoint())
 		        //    continue;
-
 		        for(InterfaceAddress interfaceAddress:iface.getInterfaceAddresses()){
 		        	InetAddress broadcast=interfaceAddress.getBroadcast();
 		        	if(broadcast==null)continue;
@@ -55,9 +61,17 @@ public class UDPClientToGetIP {
 			}
 
 		}catch(Exception e){			
-		
+			JOptionPane.showMessageDialog(referenceToChattingWindow,"FATAL ERROR : Failed to connect to server, check :-"
+					+ "\n(1)If server is running"
+					+ "\n(2)If you and server are on the same network "
+					+ "\nPlease start the application again.","ERROR",JOptionPane.ERROR_MESSAGE);
+			System.exit(0);
 		}
 
+	}
+	
+	public String getIPAddressOfServer(){
+		return serverIP;
 	}
 	
 }
