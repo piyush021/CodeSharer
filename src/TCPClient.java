@@ -19,14 +19,14 @@ public class TCPClient
 	private Socket socket;
 	private DataOutputStream dataOutputStream;
 	private DataInputStream dataInputstream;
-	final private String directoryToStoreRecievedFiles="C:\\Users\\Varsha yadav\\Saurabh\\client2";
+	private String directoryToStoreRecievedFiles;
 	public boolean isSendingFile=false;
 	public boolean isRecievingFile=false;
 	private String userName="";
 	private String serverIP="";
 	
-	public TCPClient(ChattingWindow referenceToChattingWindow,String serverIP,String userName){
-
+	public TCPClient(ChattingWindow referenceToChattingWindow,String serverIP,String userName,String defaultDirectory){
+		this.directoryToStoreRecievedFiles=defaultDirectory;
 		this.userName=userName;
 		this.referenceToChattingWindow=referenceToChattingWindow;
 		this.serverIP=serverIP;

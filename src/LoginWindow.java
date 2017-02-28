@@ -10,6 +10,7 @@ import java.io.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -62,7 +63,18 @@ class LoginWindow extends JFrame{
 					    new Thread(new Runnable(){
 					    	@Override
 					        public void run(){
-					    		new ChattingWindow(stringUsername);
+					    		JFileChooser fileChooser=new JFileChooser();
+							    fileChooser.setDialogTitle("Select Default Directory");
+							    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+							    fileChooser.setAcceptAllFileFilterUsed(false);
+							    String defaultDirectory="";
+							    while(true){
+							    	if(fileChooser.showDialog(LoginWindow.this,"Select")==JFileChooser.APPROVE_OPTION){
+							    		defaultDirectory=fileChooser.getSelectedFile().getAbsolutePath();
+							    		break;
+							    	}	
+							    }
+					    		new ChattingWindow(stringUsername,defaultDirectory);
 					    	}	        
 					    }).start();
 					    LoginWindow.this.dispose();

@@ -27,10 +27,12 @@ class ChattingWindow extends JFrame{
     JScrollPane scrollingContainerTextAreaOutgoingMessages;
     TCPClient tcpClient;
     String nameOfFileToSend="";
+    String defaultDirectory;
     
-    public ChattingWindow(String stringUserName){
+    public ChattingWindow(String stringUserName, String defaultDirectory){
     	super();
     	this.stringUserName=stringUserName;
+    	this.defaultDirectory=defaultDirectory;
 		setTitle("CodeSharer");
 		this.setIconImage(new ImageIcon(this.getClass().getResource("/mainIcon.png")).getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		//this.getContentPane().setBackground(Color.BLACK);
@@ -90,7 +92,7 @@ class ChattingWindow extends JFrame{
     private void startClient(){
     	
     	UDPClientToGetIP udpClient=new UDPClientToGetIP(ChattingWindow.this);
-    	tcpClient=new TCPClient(this, udpClient.getIPAddressOfServer(), stringUserName);
+    	tcpClient=new TCPClient(this, udpClient.getIPAddressOfServer(), stringUserName,defaultDirectory);
     	tcpClient.startTCPClient();
     	
     	buttonSend.addActionListener(new ActionListener(){
@@ -112,8 +114,12 @@ class ChattingWindow extends JFrame{
     		@Override
     		public void actionPerformed(ActionEvent e){
     			JFileChooser fileChooser=new JFileChooser();
-    			fileChooser.showDialog(rootPane,"Send");
+    			fileChooser.setDialogTitle("Select File To Send");
+    			if(fileChooser.showDialog(rootPane,"Send")!=JFileChooser.APPROVE_OPTION)
+    				return;
     			File fileToSend=fileChooser.getSelectedFile();
+    			if(fileToSend==null)
+    				return;
     			if(((int)fileToSend.length())>5242880){
     				
     				JOptionPane.showMessageDialog(getRootPane(),"Attachment of more than 5 mb is not allowed !!!","ERROR",JOptionPane.ERROR_MESSAGE);
