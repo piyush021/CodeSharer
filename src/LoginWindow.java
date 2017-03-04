@@ -68,11 +68,10 @@ class LoginWindow extends JFrame{
 							    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 							    fileChooser.setAcceptAllFileFilterUsed(false);
 							    String defaultDirectory="";
-							    while(true){
-							    	if(fileChooser.showDialog(LoginWindow.this,"Select")==JFileChooser.APPROVE_OPTION){
-							    		defaultDirectory=fileChooser.getSelectedFile().getAbsolutePath();
-							    		break;
-							    	}	
+							    if(fileChooser.showDialog(LoginWindow.this,"Select")==JFileChooser.APPROVE_OPTION){
+							  		defaultDirectory=fileChooser.getSelectedFile().getAbsolutePath();
+							   	}else{
+							   		System.exit(0);
 							    }
 					    		new ChattingWindow(stringUsername,defaultDirectory);
 					    	}	        

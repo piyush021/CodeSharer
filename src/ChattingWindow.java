@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -13,6 +14,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.IconUIResource;
 import javax.swing.text.DefaultCaret;
 
@@ -25,9 +31,16 @@ class ChattingWindow extends JFrame{
     JButton buttonAttachment;
     JScrollPane scrollingContainerTextAreaIncomingMessages;
     JScrollPane scrollingContainerTextAreaOutgoingMessages;
+    JScrollPane scrollingContainerForListOfFilesPresentInServer;
+    JList<String> listOfFilesPresentInServer;
+    DefaultListModel<String> listModelForFileName;
+    JScrollPane scrollingContainerForListOfClientsOnline;
+    JList<String> listOfClientsOnline;
+    DefaultListModel<String> listModelForClientName;
     TCPClient tcpClient;
     String nameOfFileToSend="";
     String defaultDirectory;
+    TCPClientForFileTransfer tcpClientForFileTransfer;
     
     public ChattingWindow(String stringUserName, String defaultDirectory){
     	super();
@@ -73,39 +86,79 @@ class ChattingWindow extends JFrame{
 		scrollingContainerTextAreaOutgoingMessages.setBounds(10,550,400,80);
 		scrollingContainerTextAreaIncomingMessages.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		
+		
+		//setting the list of files present in server here
+		listModelForFileName=new DefaultListModel<>();
+		listModelForFileName.addElement("     FILES ON SERVER");
+		listModelForFileName.addElement("");
+		listOfFilesPresentInServer=new JList<>(listModelForFileName);
+		listOfFilesPresentInServer.setSelectedIndex(0);
+		listOfFilesPresentInServer.setFont(new Font("Arial",Font.BOLD,10));
+		listOfFilesPresentInServer.setBorder(new EmptyBorder(5,5,5,5));
+		listOfFilesPresentInServer.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		scrollingContainerForListOfFilesPresentInServer=new JScrollPane(listOfFilesPresentInServer);
+		scrollingContainerForListOfFilesPresentInServer.setBounds(500,10,136,310);
+		scrollingContainerForListOfFilesPresentInServer.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollingContainerForListOfFilesPresentInServer.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		//setting the list of clients online here
+		listModelForClientName=new DefaultListModel<>();
+		listModelForClientName.addElement("        ACTIVE USERS");
+		listModelForClientName.addElement("");
+		listOfClientsOnline=new JList<>(listModelForClientName);
+		listOfClientsOnline.setFont(new Font("Arial",Font.BOLD,10));
+		listOfClientsOnline.setBorder(new EmptyBorder(5,5,5,5));
+		listOfClientsOnline.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listOfClientsOnline.setSelectedIndex(0);
+		//making unselectable list
+		listOfClientsOnline.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if(!e.getValueIsAdjusting()){
+					listOfClientsOnline.setSelectedIndex(0);
+				}
+			}
+		});
+		scrollingContainerForListOfClientsOnline=new JScrollPane(listOfClientsOnline);
+		scrollingContainerForListOfClientsOnline.setBounds(500,330,136,300);
+		scrollingContainerForListOfClientsOnline.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollingContainerForListOfClientsOnline.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
 		setLayout(null);
 		add(scrollingContainerTextAreaIncomingMessages);
 		add(scrollingContainerTextAreaOutgoingMessages);
+		add(scrollingContainerForListOfFilesPresentInServer);
+		add(scrollingContainerForListOfClientsOnline);
 		add(buttonSend);
 		add(buttonAttachment);
 		
 		textAreaIncomingMessages.setEditable(false);
-		setSize(506,670);
+		//setSize(506,670);
+		setSize(650,670);
 		setLocationRelativeTo(null);
 	
 		setResizable(false);
 		addWindowListener(new ExitApplication());
-		startClient();
 		setVisible(true);
+		startClients();
 	}
     
-    private void startClient(){
-    	
+    private void startClients(){
+    	//constructor of UDPClient will return only when IP of server is discovered
     	UDPClientToGetIP udpClient=new UDPClientToGetIP(ChattingWindow.this);
-    	tcpClient=new TCPClient(this, udpClient.getIPAddressOfServer(), stringUserName,defaultDirectory);
+    	tcpClient=new TCPClient(this, udpClient.getIPAddressOfServer(), stringUserName);
     	tcpClient.startTCPClient();
-    	
+    	tcpClientForFileTransfer=new TCPClientForFileTransfer(this ,udpClient.getIPAddressOfServer(),stringUserName,defaultDirectory);
+    	tcpClientForFileTransfer.startTCPClientForFileTransfer();
+        	
     	buttonSend.addActionListener(new ActionListener(){
     		@Override
     		public void actionPerformed(ActionEvent e){
-    			if(tcpClient.isSendingFile||tcpClient.isRecievingFile){
-    				JOptionPane.showMessageDialog(getRootPane(),"You can not send messagges while you upload or Download files !!!","ERROR",JOptionPane.ERROR_MESSAGE);
-    			}else{
-    				String stringMessage=ChattingWindow.this.stringUserName+" says:"
-    						+"\n"+textAreaOutgoingMessages.getText();
-    				textAreaOutgoingMessages.setText("");
-    				tcpClient.sendMessage(stringMessage);
-    			}
+
+    			String stringMessage=ChattingWindow.this.stringUserName+" says:"
+    					+"\n"+textAreaOutgoingMessages.getText();
+    			textAreaOutgoingMessages.setText("");
+    			tcpClient.sendMessage(stringMessage);
+
     		}
     	});
 
@@ -128,11 +181,28 @@ class ChattingWindow extends JFrame{
 
     				nameOfFileToSend=fileToSend.getAbsolutePath();
     				//sending command to server to start file transfer
-    				tcpClient.sendMessage("INITIATE_FILE_TRANSFER_FROM_CLIENT_TO_SERVER@"+(int)fileToSend.length()+"#"+fileToSend.getName());
+    				tcpClientForFileTransfer.sendMessage("INITIATE_FILE_TRANSFER_FROM_CLIENT_TO_SERVER@"+(int)fileToSend.length()+"#"+fileToSend.getName());
     				
     			}
     		}
     	});
+    	
+    	//adding on click listener to jlist of files on server here
+    	listOfFilesPresentInServer.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if(!e.getValueIsAdjusting()){
+					if(listOfFilesPresentInServer.getSelectedIndex()!=0){
+						int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like To Download File "+listOfFilesPresentInServer.getSelectedValue()+" ?","Download File",JOptionPane.YES_NO_OPTION);
+						if(dialogResult == JOptionPane.YES_OPTION){
+							tcpClientForFileTransfer.sendMessage("INITIATE_FILE_TRANSFER_FROM_SERVER_TO_CLIENT@#"+listOfFilesPresentInServer.getSelectedValue());
+						}
+						listOfFilesPresentInServer.setSelectedIndex(0);
+					}
+				}
+			}
+		});
 
     }
     

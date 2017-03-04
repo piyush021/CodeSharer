@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
@@ -7,7 +8,10 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 
 public class UDPClientToGetIP {
 	
@@ -21,12 +25,25 @@ public class UDPClientToGetIP {
 	}
 
 	private void startUDPClient() {
+		JDialog dialog=null;
+
+		dialog=new JDialog(referenceToChattingWindow, "", JDialog.ModalityType.MODELESS);
+		dialog.setUndecorated(true);
+		dialog.add(BorderLayout.CENTER, new JLabel("Connecting to server...please wait..."));
+		dialog.setSize(210, 20);
+		dialog.setLocationRelativeTo(referenceToChattingWindow);
+		dialog.setVisible(true);
+
 		try{
 			clientSocket=new DatagramSocket();
 			//broadcast message
 			//server with poet no. 1111 will recieve the packets
-		
 			DatagramPacket packetToSend=new DatagramPacket("IAMTHECLIENT".getBytes()
+					, "IAMTHECLIENT".getBytes().length
+					,InetAddress.getByName("255.255.255.255"),1111);
+			clientSocket.send(packetToSend);
+			//sending same message again because UDP is unreliable
+			packetToSend=new DatagramPacket("IAMTHECLIENT".getBytes()
 					, "IAMTHECLIENT".getBytes().length
 					,InetAddress.getByName("255.255.255.255"),1111);
 			clientSocket.send(packetToSend);
@@ -35,8 +52,8 @@ public class UDPClientToGetIP {
 		    Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 		    while (interfaces.hasMoreElements()) {
 		        NetworkInterface iface = interfaces.nextElement();
-		        //if (iface.isLoopback() || !iface.isUp() || iface.isVirtual() || iface.isPointToPoint())
-		        //    continue;
+		        if (iface.isLoopback() || !iface.isUp() || iface.isVirtual() || iface.isPointToPoint())
+		            continue;
 		        for(InterfaceAddress interfaceAddress:iface.getInterfaceAddresses()){
 		        	InetAddress broadcast=interfaceAddress.getBroadcast();
 		        	if(broadcast==null)continue;
@@ -56,6 +73,7 @@ public class UDPClientToGetIP {
 				recievedString=recievedString.trim();
 				if(recievedString.equals("IAMTHESERVER")){
 					serverIP=recievedPacket.getAddress().getHostAddress();
+					dialog.dispose();
 					break;
 				}
 			}
