@@ -166,6 +166,8 @@ class ChattingWindow extends JFrame{
     	buttonAttachment.addActionListener(new ActionListener(){
     		@Override
     		public void actionPerformed(ActionEvent e){
+    			if(tcpClientForFileTransfer.isSendingfile)
+    				return;
     			JFileChooser fileChooser=new JFileChooser();
     			fileChooser.setDialogTitle("Select File To Send");
     			if(fileChooser.showDialog(rootPane,"Send")!=JFileChooser.APPROVE_OPTION)
@@ -193,6 +195,8 @@ class ChattingWindow extends JFrame{
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if(!e.getValueIsAdjusting()){
+					if(tcpClientForFileTransfer.isRecievingFile)
+						return;
 					if(listOfFilesPresentInServer.getSelectedIndex()!=0){
 						int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like To Download File "+listOfFilesPresentInServer.getSelectedValue()+" ?","Download File",JOptionPane.YES_NO_OPTION);
 						if(dialogResult == JOptionPane.YES_OPTION){

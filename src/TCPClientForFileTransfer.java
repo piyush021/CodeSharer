@@ -24,6 +24,8 @@ public class TCPClientForFileTransfer {
 	private String directoryToStoreRecievedFiles;
 	private String userName="";
 	private String serverIP="";
+	public boolean isRecievingFile=false;
+	public boolean isSendingfile=false;
 	
 	
 	public TCPClientForFileTransfer(ChattingWindow referenceToChattingWindow,String serverIP,String userName,String defaultDirectory) {
@@ -82,6 +84,7 @@ public class TCPClientForFileTransfer {
 							String nameOfFileToSend=referenceToChattingWindow.nameOfFileToSend;
 							@Override
 							public void run() {
+								isSendingfile=true;
 								JDialog dialog=null;
 								JProgressBar progressBar=null;
 								FileInputStream fileInputStream=null;
@@ -127,6 +130,7 @@ public class TCPClientForFileTransfer {
 
 									}
 								}
+								isSendingfile=false;
 								dialog.dispose();
 							}
 						}).start();
@@ -135,8 +139,7 @@ public class TCPClientForFileTransfer {
 					//no need for runnable here
 					//intentionally blocking readUTF call
 					else if(message.startsWith("START_RECIEVING")){
-						System.out.println("recieving file");
-
+						isRecievingFile=true;
 						final String recievedFileName=message.trim().substring(message.trim().lastIndexOf('#')+1, message.trim().length());
 						final int recievedFileLength=Integer.valueOf(message.trim().substring(message.trim().lastIndexOf('@')+1, message.trim().lastIndexOf('#')));
 						final String absoluteFilePathOfRecievedFile=directoryToStoreRecievedFiles+"\\"+recievedFileName;
@@ -196,6 +199,7 @@ public class TCPClientForFileTransfer {
 							} catch (IOException e) {
 							}
 						}
+						isRecievingFile=false;
 						dialog.dispose();
 					}
 					else{
