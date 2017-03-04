@@ -42,7 +42,6 @@ public class TCPClientForFileTransfer {
 			dataOutputStream=new DataOutputStream(socket.getOutputStream());
 			dataInputstream=new DataInputStream(socket.getInputStream());
 		} catch (IOException e1) {
-			System.out.println(e1);
 			JOptionPane.showMessageDialog(referenceToChattingWindow,"FATAL ERROR : Failed to connect to server, check :-"
 					+ "\n(1)If server is running"
 					+ "\n(2)If you and server are on the same network "
@@ -70,6 +69,7 @@ public class TCPClientForFileTransfer {
 					try{
 						message=dataInputstream.readUTF();
 					}catch(IOException e){
+						System.out.println("file client"+e);
 						JOptionPane.showMessageDialog(referenceToChattingWindow,"FATAL ERROR : Failed to connect to server, check :-"
 								+ "\n(1)If server is running"
 								+ "\n(2)If you and server are on the same network "
@@ -118,7 +118,7 @@ public class TCPClientForFileTransfer {
 									}
 
 									outputStream.flush();
-
+									JOptionPane.showMessageDialog(referenceToChattingWindow, "Sent To Server..");
 								}catch(Exception e){
 									JOptionPane.showMessageDialog(referenceToChattingWindow,"Failed to send the file !!!","ERROR",JOptionPane.ERROR_MESSAGE);	
 								}

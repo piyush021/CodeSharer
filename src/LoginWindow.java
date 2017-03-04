@@ -59,7 +59,6 @@ class LoginWindow extends JFrame{
 				    }
 				    String stringPassword = passwordFieldPassword.getText();
 				    if(stringPassword.equals("")){
-					    setVisible(false);
 					    new Thread(new Runnable(){
 					    	@Override
 					        public void run(){

@@ -84,8 +84,8 @@ public class TCPClient
 
 					try{
 						message=dataInputstream.readUTF();
-						System.out.println(message);
 					}catch(IOException e){
+						System.out.println("normal client"+e);
 						JOptionPane.showMessageDialog(referenceToChattingWindow,"FATAL ERROR : Failed to connect to server, check :-"
 								+ "\n(1)If server is running"
 								+ "\n(2)If you and server are on the same network "
