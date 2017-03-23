@@ -109,7 +109,7 @@ class ChattingWindow extends JFrame{
 		listOfClientsOnline.setBorder(new EmptyBorder(5,5,5,5));
 		listOfClientsOnline.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listOfClientsOnline.setSelectedIndex(0);
-		//making unselectable list
+		//making unselectable list of online clients
 		listOfClientsOnline.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -153,7 +153,8 @@ class ChattingWindow extends JFrame{
     	buttonSend.addActionListener(new ActionListener(){
     		@Override
     		public void actionPerformed(ActionEvent e){
-
+    			if(textAreaOutgoingMessages.getText().equals(""))
+    				return;
     			String stringMessage=ChattingWindow.this.stringUserName+" says:"
     					+"\n"+textAreaOutgoingMessages.getText();
     			textAreaOutgoingMessages.setText("");
@@ -197,6 +198,11 @@ class ChattingWindow extends JFrame{
 				if(!e.getValueIsAdjusting()){
 					if(tcpClientForFileTransfer.isRecievingFile)
 						return;
+					String fileNameToDownload=listOfFilesPresentInServer.getSelectedValue();
+					if(fileNameToDownload.equals("")){
+						listOfFilesPresentInServer.setSelectedIndex(0);
+						return;
+					}
 					if(listOfFilesPresentInServer.getSelectedIndex()!=0){
 						int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like To Download File "+listOfFilesPresentInServer.getSelectedValue()+" ?","Download File",JOptionPane.YES_NO_OPTION);
 						if(dialogResult == JOptionPane.YES_OPTION){

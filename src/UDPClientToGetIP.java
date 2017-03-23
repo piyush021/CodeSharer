@@ -25,8 +25,8 @@ public class UDPClientToGetIP {
 	}
 
 	private void startUDPClient() {
+		
 		JDialog dialog=null;
-
 		dialog=new JDialog(referenceToChattingWindow, "", JDialog.ModalityType.MODELESS);
 		dialog.setUndecorated(true);
 		dialog.add(BorderLayout.CENTER, new JLabel("Connecting to server...please wait..."));
@@ -52,12 +52,17 @@ public class UDPClientToGetIP {
 		    Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 		    while (interfaces.hasMoreElements()) {
 		        NetworkInterface iface = interfaces.nextElement();
-		        if (iface.isLoopback() || !iface.isUp() || iface.isVirtual() || iface.isPointToPoint())
-		            continue;
+		        //if (iface.isLoopback() || !iface.isUp() || iface.isVirtual() || iface.isPointToPoint())
+		        //    continue;
 		        for(InterfaceAddress interfaceAddress:iface.getInterfaceAddresses()){
 		        	InetAddress broadcast=interfaceAddress.getBroadcast();
 		        	if(broadcast==null)continue;
 		        	packetToSend=new DatagramPacket("IAMTHECLIENT".getBytes()
+							, "IAMTHECLIENT".getBytes().length
+							, broadcast,1111);
+					clientSocket.send(packetToSend);
+					//just in case first packet got lost
+					packetToSend=new DatagramPacket("IAMTHECLIENT".getBytes()
 							, "IAMTHECLIENT".getBytes().length
 							, broadcast,1111);
 					clientSocket.send(packetToSend);
@@ -82,7 +87,8 @@ public class UDPClientToGetIP {
 			JOptionPane.showMessageDialog(referenceToChattingWindow,"FATAL ERROR : Failed to connect to server, check :-"
 					+ "\n(1)If server is running"
 					+ "\n(2)If you and server are on the same network "
-					+ "\nPlease start the application again.","ERROR",JOptionPane.ERROR_MESSAGE);
+					+ "\nPlease start the application again."
+					+ "\n"+e.toString(),"ERROR",JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
 

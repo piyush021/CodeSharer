@@ -39,7 +39,8 @@ public class TCPClient
 			JOptionPane.showMessageDialog(referenceToChattingWindow,"FATAL ERROR : Failed to connect to server, check :-"
 					+ "\n(1)If server is running"
 					+ "\n(2)If you and server are on the same network "
-					+ "\nPlease start the application again.","ERROR",JOptionPane.ERROR_MESSAGE);
+					+ "\nPlease start the application again."
+					+ "\n"+e1.toString(),"ERROR",JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
 
@@ -50,7 +51,8 @@ public class TCPClient
 			JOptionPane.showMessageDialog(referenceToChattingWindow,"FATAL ERROR : Failed to connect to server, check :-"
 					+ "\n(1)If server is running"
 					+ "\n(2)If you and server are on the same network "
-					+ "\nPlease start the application again.","ERROR",JOptionPane.ERROR_MESSAGE);
+					+ "\nPlease start the application again."
+					+ "\n"+e.toString(),"ERROR",JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
 		
@@ -64,7 +66,8 @@ public class TCPClient
 			JOptionPane.showMessageDialog(referenceToChattingWindow,"FATAL ERROR : Failed to connect to server, check :-"
 					+ "\n(1)If server is running"
 					+ "\n(2)If you and server are on the same network "
-					+ "\nPlease start the application again.","ERROR",JOptionPane.ERROR_MESSAGE);
+					+ "\nPlease start the application again."
+					+ "\n"+e.toString(),"ERROR",JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
 		
@@ -89,7 +92,8 @@ public class TCPClient
 						JOptionPane.showMessageDialog(referenceToChattingWindow,"FATAL ERROR : Failed to connect to server, check :-"
 								+ "\n(1)If server is running"
 								+ "\n(2)If you and server are on the same network "
-								+ "\nPlease start the application again.","ERROR",JOptionPane.ERROR_MESSAGE);
+								+ "\nPlease start the application again."
+								+ "\n"+e.toString(),"ERROR",JOptionPane.ERROR_MESSAGE);
 						System.exit(0);
 					}
 					if(message.trim().startsWith("INSERT@")){
