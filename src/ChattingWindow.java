@@ -156,7 +156,7 @@ class ChattingWindow extends JFrame{
     			if(textAreaOutgoingMessages.getText().equals(""))
     				return;
     			String stringMessage=ChattingWindow.this.stringUserName+" says:"
-    					+"\n"+textAreaOutgoingMessages.getText();
+    					+"\n\n"+textAreaOutgoingMessages.getText();
     			textAreaOutgoingMessages.setText("");
     			tcpClient.sendMessage(stringMessage);
 

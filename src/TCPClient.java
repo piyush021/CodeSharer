@@ -31,6 +31,13 @@ public class TCPClient
 	//too much work
 	//must not call this function in constructor
 	public void startTCPClient(){
+		JDialog dialog=null;
+		dialog=new JDialog(referenceToChattingWindow, "", JDialog.ModalityType.MODELESS);
+		dialog.setUndecorated(true);
+		dialog.add(BorderLayout.CENTER, new JLabel("Connecting to server...please wait..."));
+		dialog.setSize(210, 20);
+		dialog.setLocationRelativeTo(referenceToChattingWindow);
+		dialog.setVisible(true);
 		try {
 			socket=new Socket(serverIP,2222);
 			dataOutputStream=new DataOutputStream(socket.getOutputStream());
@@ -43,7 +50,6 @@ public class TCPClient
 					+ "\n"+e1.toString(),"ERROR",JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
-
 		//sending name of the client as first message
 		try {
 			dataOutputStream.writeUTF(userName);
@@ -77,7 +83,7 @@ public class TCPClient
 			referenceToChattingWindow.listModelForClientName.addElement(userNamesOfActiveClients.substring(0, userNamesOfActiveClients.indexOf("+")));
 			userNamesOfActiveClients=userNamesOfActiveClients.substring(userNamesOfActiveClients.indexOf("+")+1);
 		}
-		
+		dialog.dispose();
 		//starting new thread to wait for messages
 		new Thread(new Runnable() {
 			String message;

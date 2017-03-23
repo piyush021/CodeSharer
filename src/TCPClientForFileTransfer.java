@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
@@ -37,6 +38,13 @@ public class TCPClientForFileTransfer {
 	}
 	
 	public void startTCPClientForFileTransfer(){
+		JDialog dialog=null;
+		dialog=new JDialog(referenceToChattingWindow, "", JDialog.ModalityType.MODELESS);
+		dialog.setUndecorated(true);
+		dialog.add(BorderLayout.CENTER, new JLabel("Connecting to server...please wait..."));
+		dialog.setSize(210, 20);
+		dialog.setLocationRelativeTo(referenceToChattingWindow);
+		dialog.setVisible(true);
 		try {
 			socket=new Socket(serverIP,3333);
 			dataOutputStream=new DataOutputStream(socket.getOutputStream());
@@ -61,7 +69,7 @@ public class TCPClientForFileTransfer {
 					+"\n"+e.toString(),"ERROR",JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
-		
+		dialog.dispose();
 		new Thread(new Runnable() {
 			String message;
 			@Override
